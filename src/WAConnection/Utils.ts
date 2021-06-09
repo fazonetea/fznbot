@@ -9,7 +9,7 @@ import HttpsProxyAgent from 'https-proxy-agent'
 import { URL } from 'url'
 import { Agent } from 'https'
 import Decoder from '../Binary/Decoder'
-import { MessageType, HKDFInfoKeys, MessageOptions, WAChat, WAMessageContent, BaileysError, WAMessageProto, TimedOutError, CancelledError, WAGenericMediaMessage, WAMessage, WAMessageKey, DEFAULT_ORIGIN, WAMediaUpload } from './Constants'
+import { MessageType, HKDFInfoKeys, MessageOptions, WAChat, WAMessageContent, FAZONEError, WAMessageProto, TimedOutError, CancelledError, WAGenericMediaMessage, WAMessage, WAMessageKey, DEFAULT_ORIGIN, WAMediaUpload } from './Constants'
 import KeyedDB from '@adiwajshing/keyed-db'
 import got, { Options, Response } from 'got'
 import { join } from 'path'
@@ -24,7 +24,7 @@ const platformMap = {
 export const Browsers = {
     ubuntu: browser => ['Ubuntu', browser, '18.04'] as [string, string, string],
     macOS: browser => ['Mac OS', browser, '10.15.3'] as [string, string, string],
-    baileys: browser => ['Baileys', browser, '3.0'] as [string, string, string],
+    FAZONE: browser => ['FAZONE', browser, '3.0'] as [string, string, string],
     /** The appropriate browser based on your OS & release */
     appropriate: browser => [ platformMap [platform()] || 'Ubuntu', browser, release() ] as [string, string, string]
 }
@@ -169,7 +169,7 @@ export function generateMessageID() {
 }
 export function decryptWA (message: string | Buffer, macKey: Buffer, encKey: Buffer, decoder: Decoder, fromMe: boolean=false): [string, Object, [number, number]?] {
     let commaIndex = message.indexOf(',') // all whatsapp messages have a tag and a comma, followed by the actual message
-    if (commaIndex < 0) throw new BaileysError ('invalid message', { message }) // if there was no comma, then this message must be not be valid
+    if (commaIndex < 0) throw new FAZONEError ('invalid message', { message }) // if there was no comma, then this message must be not be valid
     
     if (message[commaIndex+1] === ',') commaIndex += 1
     let data = message.slice(commaIndex+1, message.length)
@@ -184,7 +184,7 @@ export function decryptWA (message: string | Buffer, macKey: Buffer, encKey: Buf
             json = JSON.parse(data) // parse the JSON
         } else {
             if (!macKey || !encKey) {
-                throw new BaileysError ('recieved encrypted buffer when auth creds unavailable', { message })
+                throw new FAZONEError ('recieved encrypted buffer when auth creds unavailable', { message })
             }
             /* 
                 If the data recieved was not a JSON, then it must be an encrypted message.
@@ -204,7 +204,7 @@ export function decryptWA (message: string | Buffer, macKey: Buffer, encKey: Buf
                 const decrypted = aesDecrypt(data, encKey) // decrypt using AES
                 json = decoder.read(decrypted) // decode the binary message into a JSON array
             } else {
-                throw new BaileysError ('checksum failed', {
+                throw new FAZONEError ('checksum failed', {
                     received: checksum.toString('hex'),
                     computed: computedChecksum.toString('hex'),
                     data: data.slice(0, 80).toString(),
@@ -317,7 +317,7 @@ export const getGotStream = async(url: string | URL, options: Options & { isStre
         fetched.once('error', reject)
         fetched.once('response', ({statusCode: status}: Response) => {
             if (status >= 400) {
-                reject(new BaileysError (
+                reject(new FAZONEError (
                     'Invalid code (' + status + ') returned', 
                     { status }
                 ))
@@ -397,10 +397,10 @@ export async function decryptMediaMessageBuffer(message: WAMessageContent): Prom
     */
     const type = Object.keys(message)[0] as MessageType
     if (!type) {
-        throw new BaileysError('unknown message type', message)
+        throw new FAZONEError('unknown message type', message)
     }
     if (type === MessageType.text || type === MessageType.extendedText) {
-        throw new BaileysError('cannot decode text message', message)
+        throw new FAZONEError('cannot decode text message', message)
     }
     if (type === MessageType.location || type === MessageType.liveLocation) {
         const buffer = Buffer.from(message[type].jpegThumbnail)
@@ -412,7 +412,7 @@ export async function decryptMediaMessageBuffer(message: WAMessageContent): Prom
     let messageContent: WAGenericMediaMessage
     if (message.productMessage) {
         const product = message.productMessage.product?.productImage
-        if (!product) throw new BaileysError ('product has no image', message)
+        if (!product) throw new FAZONEError ('product has no image', message)
         messageContent = product
     } else {
         messageContent = message[type]

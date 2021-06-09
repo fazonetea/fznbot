@@ -1,5 +1,5 @@
 import {WAConnection as Base} from './7.MessagesExtra'
-import { WAMetric, WAFlag, WANode, WAGroupMetadata, WAGroupCreateResponse, WAGroupModification, BaileysError } from '../WAConnection/Constants'
+import { WAMetric, WAFlag, WANode, WAGroupMetadata, WAGroupCreateResponse, WAGroupModification, FAZONEError } from '../WAConnection/Constants'
 import { GroupSettingChange } from './Constants'
 import { generateMessageID, whatsappID } from '../WAConnection/Utils'
 import { Mutex } from './Mutex'
@@ -24,7 +24,7 @@ export class WAConnection extends Base {
     }
     /** 
      * Get the metadata of the group
-     * Baileys automatically caches & maintains this state
+     * FAZONE automatically caches & maintains this state
      */
     @Mutex(jid => jid)
     async groupMetadata (jid: string) {
@@ -110,7 +110,7 @@ export class WAConnection extends Base {
      */
     groupUpdateSubject = async (jid: string, title: string) => {
         const chat = this.chats.get (jid)
-        if (chat?.name === title) throw new BaileysError ('redundant change', { status: 400 })
+        if (chat?.name === title) throw new FAZONEError ('redundant change', { status: 400 })
         
         const response = await this.groupQuery('subject', jid, title)
         if (chat) chat.name = title

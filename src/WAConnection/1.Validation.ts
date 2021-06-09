@@ -1,7 +1,7 @@
 import * as Curve from 'curve25519-js'
 import * as Utils from './Utils'
 import {WAConnection as Base} from './0.Base'
-import { WAMetric, WAFlag, BaileysError, Presence, WAUser, WAInitResponse, WAOpenResult } from './Constants'
+import { WAMetric, WAFlag, FAZONEError, Presence, WAUser, WAInitResponse, WAOpenResult } from './Constants'
 
 export class WAConnection extends Base {
 
@@ -78,7 +78,7 @@ export class WAConnection extends Base {
         this.initTimeout = null
 
         if (response.status && response.status !== 200) {
-            throw new BaileysError(`Unexpected error in login`, { response, status: response.status })
+            throw new FAZONEError(`Unexpected error in login`, { response, status: response.status })
         }
         // if its a challenge request (we get it when logging in)
         if (response[1]?.challenge) {
@@ -158,7 +158,7 @@ export class WAConnection extends Base {
 
         if (!hmac.equals(secret.slice(32, 64))) {
             // if the checksums didn't match
-            throw new BaileysError ('HMAC validation failed', json)
+            throw new FAZONEError ('HMAC validation failed', json)
         }
 
         // computed HMAC should equal secret[32:64]

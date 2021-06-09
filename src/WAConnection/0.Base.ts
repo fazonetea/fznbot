@@ -9,7 +9,7 @@ import {
     WAUser,
     WANode,
     WATag,
-    BaileysError,
+    FAZONEError,
     WAMetric,
     WAFlag,
     DisconnectReason,
@@ -34,7 +34,7 @@ export class WAConnection extends EventEmitter {
     /** The version of WhatsApp Web we're telling the servers we are */
     version: [number, number, number] = [2, 2112, 10]
     /** The Browser we're telling the WhatsApp Web servers we are */
-    browserDescription: [string, string, string] = Utils.Browsers.baileys ('Chrome')
+    browserDescription: [string, string, string] = Utils.Browsers.FAZONE ('Chrome')
     /** Metadata like WhatsApp id, name set on WhatsApp etc. */
     user: WAUser
     /** Should requests be queued when the connection breaks in between; if 0, then an error will be thrown */
@@ -56,7 +56,7 @@ export class WAConnection extends EventEmitter {
     /** key to use to order chats */
     chatOrderingKey = Utils.waChatKey(false)
 
-    logger = logger.child ({ class: 'Baileys' })
+    logger = logger.child ({ class: 'FAZONE' })
 
     /** log messages */
     shouldLogMessages = false 
@@ -194,7 +194,7 @@ export class WAConnection extends EventEmitter {
             const result = await Utils.promiseTimeout(timeoutMs,
                 (resolve, reject) => {
                     onRecv = resolve
-                    onErr = ({ reason, status }) => reject(new BaileysError(reason, { status }))
+                    onErr = ({ reason, status }) => reject(new FAZONEError(reason, { status }))
                     this.on (`TAG:${tag}`, onRecv)
                     this.on ('ws-close', onErr) // if the socket closes, you'll never receive the message
                 },
@@ -243,7 +243,7 @@ export class WAConnection extends EventEmitter {
                 const response = await promise
                 if (expect200 && response.status && Math.floor(+response.status / 100) !== 2) {
                     const message = STATUS_CODES[response.status] || 'unknown'
-                    throw new BaileysError (
+                    throw new FAZONEError (
                         `Unexpected status in '${json[0] || 'query'}': ${STATUS_CODES[response.status]}(${response.status})`, 
                         {query: json, message, status: response.status}
                     )
@@ -369,7 +369,7 @@ export class WAConnection extends EventEmitter {
         let onClose: ({ reason }) => void
 
         if (this.pendingRequestTimeoutMs !== null && this.pendingRequestTimeoutMs <= 0) {
-            throw new BaileysError(DisconnectReason.close, { status: 428 })
+            throw new FAZONEError(DisconnectReason.close, { status: 428 })
         }
         await (
             Utils.promiseTimeout (

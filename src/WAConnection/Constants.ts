@@ -71,13 +71,13 @@ export const WA_MESSAGE_STUB_TYPES = function () {
     return dict
 }()
 
-export class BaileysError extends Error {
+export class FAZONEError extends Error {
     status?: number
     context: any
 
     constructor (message: string, context: any, stack?: string) {
         super (message)
-        this.name = 'BaileysError'
+        this.name = 'FAZONEError'
         this.status = context.status
         this.context = context
         if(stack) {
@@ -85,8 +85,8 @@ export class BaileysError extends Error {
         }
     }
 }
-export const TimedOutError = (stack?: string) => new BaileysError ('timed out', { status: 408 }, stack)
-export const CancelledError = (stack?: string) => new BaileysError ('cancelled', { status: 500 }, stack)
+export const TimedOutError = (stack?: string) => new FAZONEError ('timed out', { status: 408 }, stack)
+export const CancelledError = (stack?: string) => new FAZONEError ('cancelled', { status: 500 }, stack)
 
 export interface WAQuery {
     json: any[] | WANode
@@ -208,7 +208,7 @@ export interface WAGroupMetadata {
     restrict?: 'true' | 'false' 
     /** is set when the group only allows admins to write messages */
     announce?: 'true' | 'false' 
-    // Baileys modified array
+    // FAZONE modified array
     participants: WAGroupParticipant[]
 }
 export interface WAGroupModification {
@@ -232,7 +232,7 @@ export interface WAContact {
     index?: string
     /** short name for the contact */
     short?: string
-    // Baileys Added
+    // FAZONE Added
     imgUrl?: string
 }
 export interface WAUser extends WAContact {
@@ -258,7 +258,7 @@ export interface WAChat {
     /** how long each message lasts for */
     ephemeral?: string
     
-    // Baileys added properties
+    // FAZONE added properties
     messages: KeyedDB<WAMessage, string>
     imgUrl?: string
     presences?: { [k: string]: WAPresenceData }
@@ -483,7 +483,7 @@ export const MimetypeMap = {
     stickerMessage: Mimetype.webp,
 }
 export type WAParticipantAction = 'add' | 'remove' | 'promote' | 'demote'
-export type BaileysEvent = 
+export type FAZONEEvent = 
     'open' | 
     'connecting' |
     'close' |

@@ -1,5 +1,5 @@
 import * as Utils from './Utils'
-import { KEEP_ALIVE_INTERVAL_MS, BaileysError, WAConnectOptions, DisconnectReason, UNAUTHORIZED_CODES, CancelledError, WAOpenResult, DEFAULT_ORIGIN, WS_URL } from './Constants'
+import { KEEP_ALIVE_INTERVAL_MS, FAZONEError, WAConnectOptions, DisconnectReason, UNAUTHORIZED_CODES, CancelledError, WAOpenResult, DEFAULT_ORIGIN, WS_URL } from './Constants'
 import {WAConnection as Base} from './1.Validation'
 import Decoder from '../Binary/Decoder'
 import WS from 'ws'
@@ -12,7 +12,7 @@ export class WAConnection extends Base {
     async connect () {
         // if we're already connected, throw an error
         if (this.state !== 'close') {
-            throw new BaileysError('cannot connect when state=' + this.state, { status: 409 })
+            throw new FAZONEError('cannot connect when state=' + this.state, { status: 409 })
         }
         
         const options = this.connectOptions
@@ -37,7 +37,7 @@ export class WAConnection extends Base {
             } catch (error) {
                 lastConnect = new Date()
 
-                const loggedOut = error instanceof BaileysError && UNAUTHORIZED_CODES.includes(error.status)
+                const loggedOut = error instanceof FAZONEError && UNAUTHORIZED_CODES.includes(error.status)
                 const willReconnect = !loggedOut && (tries < options?.maxRetries) && (this.state === 'connecting')
                 const reason = loggedOut ? DisconnectReason.invalidSession : error.message
 

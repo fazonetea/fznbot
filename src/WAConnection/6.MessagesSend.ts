@@ -11,7 +11,7 @@ import {
     WAContactsArrayMessage,
     WAGroupInviteMessage,
     WATextMessage,
-    WAMessageContent, WAMetric, WAFlag, WAMessage, BaileysError, WA_MESSAGE_STATUS_TYPE, WAMessageProto, MediaConnInfo, MessageTypeProto, URL_REGEX, WAUrlInfo, WA_DEFAULT_EPHEMERAL, WAMediaUpload
+    WAMessageContent, WAMetric, WAFlag, WAMessage, FAZONEError, WA_MESSAGE_STATUS_TYPE, WAMessageProto, MediaConnInfo, MessageTypeProto, URL_REGEX, WAUrlInfo, WA_DEFAULT_EPHEMERAL, WAMediaUpload
 } from './Constants'
 import { isGroupID, generateMessageID, extensionForMediaMessage, whatsappID, unixTimestampSeconds, getAudioDuration, newMessagesDB, encryptedStream, decryptMediaMessageBuffer, generateThumbnail  } from './Utils'
 import { Mutex } from './Mutex'
@@ -94,7 +94,7 @@ export class WAConnection extends Base {
                     }
                     m.extendedTextMessage = WAMessageProto.ExtendedTextMessage.fromObject(message as any)
                 } else {
-                    throw new BaileysError ('message needs to be a string or object with property \'text\'', message)
+                    throw new FAZONEError ('message needs to be a string or object with property \'text\'', message)
                 }
                 break
             case MessageType.location:
@@ -341,7 +341,7 @@ export class WAConnection extends Base {
     @Mutex (message => message?.key?.id)
     async updateMediaMessage (message: WAMessage) {
         const content = message.message?.audioMessage || message.message?.videoMessage || message.message?.imageMessage || message.message?.stickerMessage || message.message?.documentMessage 
-        if (!content) throw new BaileysError (`given message ${message.key.id} is not a media message`, message)
+        if (!content) throw new FAZONEError (`given message ${message.key.id} is not a media message`, message)
         
         const query = ['query',{type: 'media', index: message.key.id, owner: message.key.fromMe ? 'true' : 'false', jid: message.key.remoteJid, epoch: this.msgCount.toString()},null]
         const response = await this.query ({
@@ -362,7 +362,7 @@ export class WAConnection extends Base {
     @Mutex (message => message?.key?.id)
     async downloadMediaMessage (message: WAMessage, type: 'buffer' | 'stream' = 'buffer') {
         let mContent = message.message?.ephemeralMessage?.message || message.message
-        if (!mContent) throw new BaileysError('No message present', { status: 400 })
+        if (!mContent) throw new FAZONEError('No message present', { status: 400 })
 
         const downloadMediaMessage = async () => {
             const stream = await decryptMediaMessageBuffer(mContent)
@@ -380,7 +380,7 @@ export class WAConnection extends Base {
             const buff = await downloadMediaMessage()
             return buff
         } catch (error) {
-            if (error instanceof BaileysError && error.status === 404) { // media needs to be updated
+            if (error instanceof FAZONEError && error.status === 404) { // media needs to be updated
                 this.logger.info (`updating media of message: ${message.key.id}`)
                 await this.updateMediaMessage (message)
                 mContent = message.message?.ephemeralMessage?.message || message.message

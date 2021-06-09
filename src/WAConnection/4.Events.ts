@@ -1,6 +1,6 @@
 import * as QR from 'qrcode-terminal'
 import { WAConnection as Base } from './3.Connect'
-import { WAMessage, WAContact, WAChat, WAMessageProto, WA_MESSAGE_STUB_TYPE, WA_MESSAGE_STATUS_TYPE, PresenceUpdate, BaileysEvent, DisconnectReason, WAOpenResult, Presence, WAParticipantAction, WAGroupMetadata, WANode, WAPresenceData, WAChatUpdate, BlocklistUpdate, WAContactUpdate, WAMetric, WAFlag } from './Constants'
+import { WAMessage, WAContact, WAChat, WAMessageProto, WA_MESSAGE_STUB_TYPE, WA_MESSAGE_STATUS_TYPE, PresenceUpdate, FAZONEEvent, DisconnectReason, WAOpenResult, Presence, WAParticipantAction, WAGroupMetadata, WANode, WAPresenceData, WAChatUpdate, BlocklistUpdate, WAContactUpdate, WAMetric, WAFlag } from './Constants'
 import { whatsappID, unixTimestampSeconds, GET_MESSAGE_ID, WA_MESSAGE_ID, newMessagesDB, shallowChanges, toNumber, isGroupID } from './Utils'
 import KeyedDB from '@adiwajshing/keyed-db'
 import { Mutex } from './Mutex'
@@ -706,8 +706,8 @@ export class WAConnection extends Base {
     /** when a user is blocked or unblockd */
     on (event: 'blocklist-update', listener: (update: BlocklistUpdate) => void): this
 
-    on (event: BaileysEvent | string, listener: (json: any) => void): this
+    on (event: FAZONEEvent | string, listener: (json: any) => void): this
 
-    on (event: BaileysEvent | string, listener: (...args: any[]) => void) { return super.on (event, listener) }
-    emit (event: BaileysEvent | string, ...args: any[]) { return super.emit (event, ...args) }
+    on (event: FAZONEEvent | string, listener: (...args: any[]) => void) { return super.on (event, listener) }
+    emit (event: FAZONEEvent | string, ...args: any[]) { return super.emit (event, ...args) }
 }

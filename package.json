@@ -2,7 +2,7 @@
   "name": "@fazonetea/fznbot",
   "version": "3.5.0",
   "description": "WhatsApp Web API",
-  "homepage": "https://github.com/adiwajshing/Baileys",
+  "homepage": "https://github.com/fazonetea/fznbot",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "keywords": [
@@ -26,7 +26,7 @@
     "gen-protobuf": "bash src/Binary/GenerateStatics.sh",
     "browser-decode": "yarn ts-node src/BrowserMessageDecoding.ts"
   },
-  "author": "Creator: Adhiraj Singh, Recode: By Fazone",
+  "author": "Creator: Adhiraj Singh, Recode: Fazone",
   "license": "MIT",
   "repository": {
     "url": "git@github.com:fazonetea/fznbot.git"
